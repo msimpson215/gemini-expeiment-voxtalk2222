@@ -2,109 +2,112 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Vox Talk AI Prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vox Talk AI - The Brain</title>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #111; color: white; overflow: hidden; }
+        
+        /* The Background Store Image */
+        #bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://i.imgur.com/uR1xIEx.png') no-repeat center center;
+            background-size: cover; filter: blur(8px) brightness(0.4); z-index: 1;
         }
 
-        /* The "Store" Background */
-        #store-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: url('https://i.imgur.com/uR1xIEx.png') no-repeat center center; /* Placeholder Walmart-ish bg */
-            background-size: cover;
-            filter: blur(5px) brightness(0.7);
-            z-index: 1;
-        }
-
-        /* The AI Brain (The Ball) */
+        /* The Vox Brain (Pulsating Orb) */
+        .container { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        
         #vox-brain {
-            position: relative;
-            z-index: 10;
-            width: 150px;
-            height: 150px;
+            width: 180px; height: 180px;
             background: radial-gradient(circle, #0071dc 0%, #ffc220 100%);
             border-radius: 50%;
-            box-shadow: 0 0 50px rgba(0, 113, 220, 0.6);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.3s ease;
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 60px rgba(0, 113, 220, 0.8);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; animation: pulse 2.5s infinite; transition: all 0.3s;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 113, 220, 0.4); }
-            50% { transform: scale(1.1); box-shadow: 0 0 60px rgba(255, 194, 32, 0.8); }
-            100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 113, 220, 0.4); }
+            0% { transform: scale(1); box-shadow: 0 0 30px #0071dc; }
+            50% { transform: scale(1.1); box-shadow: 0 0 70px #ffc220; }
+            100% { transform: scale(1); box-shadow: 0 0 30px #0071dc; }
         }
 
-        /* Result Card */
+        /* Upload Zone */
+        #upload-zone {
+            margin-top: 30px; padding: 20px;
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 15px; text-align: center; background: rgba(0,0,0,0.5);
+            transition: 0.3s; width: 300px;
+        }
+        #upload-zone:hover { border-color: #ffc220; background: rgba(0,0,0,0.7); }
+
+        /* The Result Card */
         #result-card {
-            position: absolute;
-            bottom: -200px;
-            z-index: 20;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            width: 300px;
-            text-align: center;
-            transition: bottom 0.5s ease-out;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, 200%);
+            background: white; color: #333; padding: 25px; border-radius: 20px;
+            width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        #result-card.show { bottom: 50px; }
-
-        .btn-cart {
-            background: #ffc220;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        #result-card.active { transform: translate(-50%, -50%); }
+        
+        .btn { background: #0071dc; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="store-bg"></div>
+<div id="bg-overlay"></div>
 
-    <div id="vox-brain" onclick="startTalking()">
-        <span style="color: white; font-weight: bold; text-align: center;">VOX TALK<br>Click Me</span>
+<div class="container">
+    <div id="vox-brain" onclick="simulateTalk()">
+        <strong style="text-shadow: 1px 1px 5px black;">VOX TALK</strong>
     </div>
 
-    <div id="result-card" id="card">
-        <h3 id="item-name">Found: HEI Distributor</h3>
-        <p id="item-desc">Fits: 1975 Corvette 350 V8</p>
-        <button class="btn-cart" onclick="addToCart()">Add Straight to Cart</button>
+    <div id="upload-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+        <p>Drop Grocery PDF/List Here</p>
+        <input type="file" id="fileInput" style="display:none" onchange="handleFile()">
+        <small style="color: #ccc;">or click to upload</small>
     </div>
+</div>
 
-    <script>
-        function startTalking() {
-            const brain = document.getElementById('vox-brain');
-            brain.style.animation = "pulse 0.5s infinite"; // Speed up animation
-            
-            // Simulating the "Thinking" process
-            setTimeout(() => {
-                document.getElementById('result-card').classList.add('show');
-                brain.style.animation = "pulse 2s infinite";
-            }, 1500);
-        }
+<div id="result-card">
+    <h2 id="status-title">AI Processing...</h2>
+    <div id="item-details">
+        <p><strong>Item:</strong> <span id="item-name">Searching...</span></p>
+        <p><strong>SKU:</strong> <span id="sku">---</span></p>
+    </div>
+    <button class="btn" onclick="closeCard()">Add to Cart & Continue</button>
+</div>
 
-        function addToCart() {
-            alert("Added to Cart! Connecting to Store API...");
-            document.getElementById('result-card').classList.remove('show');
-        }
-    </script>
+<script>
+    function simulateTalk() {
+        const brain = document.getElementById('vox-brain');
+        brain.style.animation = "pulse 0.4s infinite"; // Talk speed
+        
+        setTimeout(() => {
+            showResult("Ribeye Steak", "WM-109283");
+            brain.style.animation = "pulse 2.5s infinite";
+        }, 2000);
+    }
+
+    function dragOverHandler(ev) { ev.preventDefault(); }
+
+    function dropHandler(ev) {
+        ev.preventDefault();
+        showResult("Processing List...", "Reading PDF...");
+        setTimeout(() => showResult("Peanuts (Unsalted)", "SKU-44552"), 2000);
+    }
+
+    function showResult(name, sku) {
+        document.getElementById('item-name').innerText = name;
+        document.getElementById('sku').innerText = sku;
+        document.getElementById('status-title').innerText = "Found Match!";
+        document.getElementById('result-card').classList.add('active');
+    }
+
+    function closeCard() {
+        document.getElementById('result-card').classList.remove('active');
+    }
+</script>
+
 </body>
 </html>
