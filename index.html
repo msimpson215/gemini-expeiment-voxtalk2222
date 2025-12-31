@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Walmart AI Assistant Prototype</title>
     <style>
         :root {
@@ -12,7 +13,7 @@
 
         body {
             margin: 0;
-            font-family: "Bogle", "Helvetica Neue", Arial, sans-serif;
+            font-family: "Segoe UI", Arial, sans-serif;
             background-color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -21,7 +22,7 @@
             color: var(--text-gray);
         }
 
-        /* Top Logo Section */
+        /* Top Header */
         #header {
             width: 100%;
             display: flex;
@@ -63,7 +64,7 @@
             cursor: pointer;
         }
 
-        /* Central Voice Circle Section */
+        /* Central Voice Area */
         #voice-container {
             flex-grow: 1;
             display: flex;
@@ -100,7 +101,7 @@
             border: none;
         }
 
-        /* Text Input Area (Privacy) */
+        /* Privacy Text Input */
         #text-input-section {
             width: 100%;
             max-width: 500px;
@@ -118,9 +119,7 @@
             outline: none;
         }
 
-        .mic-icon { font-size: 20px; cursor: pointer; }
-
-        /* Footer Section */
+        /* Footer */
         #footer {
             width: 100%;
             padding: 20px;
@@ -142,7 +141,6 @@
 
     <div id="header">
         <div class="wmt-logo">Walmart <span class="spark">✱</span></div>
-        
         <div class="button-row">
             <div class="action-btn">CHECK OUT</div>
             <div class="action-btn">INFO</div>
@@ -151,20 +149,19 @@
     </div>
 
     <div id="voice-container">
-        <div id="voice-circle">
+        <div id="voice-circle" onclick="startTalking()">
             <svg width="60" height="60" viewBox="0 0 24 24" fill="white">
                 <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
             </svg>
         </div>
         <button id="pause-btn">⏸</button>
-        <div id="transcript">Listening for your grocery list...</div>
+        <div id="transcript">Click the circle to talk to the AI...</div>
     </div>
 
     <div id="text-input-section">
-        <span class="mic-icon">🎤</span>
-        <input type="text" class="input-box" placeholder="Type your grocery list here...">
-        <button style="background:none; border:none; color:var(--wmt-blue); font-weight:bold; cursor:pointer;">SEND</button>
+        🎤 <input type="text" id="manualInput" class="input-box" placeholder="Type your grocery list here...">
+        <button onclick="sendText()" style="background:none; border:none; color:var(--wmt-blue); font-weight:bold; cursor:pointer;">SEND</button>
     </div>
 
     <div id="footer">
@@ -173,16 +170,46 @@
     </div>
 
     <script>
-        // Simple logic to pause animation
         const circle = document.getElementById('voice-circle');
         const pauseBtn = document.getElementById('pause-btn');
         let isPaused = false;
 
-        pauseBtn.onclick = () => {
+        pauseBtn.onclick = (e) => {
+            e.stopPropagation();
             isPaused = !isPaused;
             circle.style.animation = isPaused ? 'none' : 'pulsate 2s infinite';
             pauseBtn.innerText = isPaused ? '▶' : '⏸';
         };
+
+        async function startTalking() {
+            if(isPaused) return;
+            circle.style.animation = "pulsate 0.5s infinite";
+            document.getElementById('transcript').innerText = "Connecting to Vox Talk Brain...";
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: "I am ready to shop." })
+                });
+                const data = await response.json();
+                if(data.error) throw new Error(data.error);
+                alert("AI Brain says: " + data.choices[0].message.content);
+                document.getElementById('transcript').innerText = "AI is ready.";
+            } catch (err) {
+                alert("Connection Failed: Ensure your OPENAI_API_KEY is set in Render!");
+                document.getElementById('transcript').innerText = "Connection error.";
+            } finally {
+                circle.style.animation = "pulsate 2s infinite";
+            }
+        }
+
+        async function sendText() {
+            const input = document.getElementById('manualInput').value;
+            if(!input) return;
+            alert("Sending text list: " + input);
+            // This would also call startTalking() with the real text
+        }
     </script>
 </body>
 </html>
