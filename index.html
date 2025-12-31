@@ -2,88 +2,187 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Walmart AI Assistant</title>
+    <title>Walmart AI Assistant Prototype</title>
     <style>
         :root {
             --wmt-blue: #0071ce;
             --wmt-yellow: #ffc220;
+            --text-gray: #444;
         }
 
-        body, html { margin: 0; padding: 0; font-family: "Bogle", sans-serif; overflow: hidden; }
-
-        /* Use your Walmart Static Screen as the background */
-        #site-background {
-            position: fixed; width: 100%; height: 100%;
-            background: url('https://i.imgur.com/vH9v5Zt.jpg') no-repeat top center; /* Replace with your file link */
-            background-size: cover; z-index: 1;
+        body {
+            margin: 0;
+            font-family: "Bogle", "Helvetica Neue", Arial, sans-serif;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            color: var(--text-gray);
         }
 
-        /* The AI Trigger Bar - Matches the Blue Header */
-        #ai-trigger {
-            position: fixed; top: 120px; width: 100%; background: var(--wmt-yellow);
-            color: #333; text-align: center; padding: 12px; font-weight: bold;
-            z-index: 10; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        /* Top Logo Section */
+        #header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
         }
 
-        /* The Friendly Assistant Overlay */
-        #ai-assistant {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); z-index: 100;
-            flex-direction: column; align-items: center; justify-content: center;
+        .wmt-logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--wmt-blue);
+            display: flex;
+            align-items: center;
         }
 
-        /* The Friendly Pulsating Spark */
-        #spark {
-            width: 120px; height: 120px;
-            background: url('https://i.imgur.com/2i6oUfQ.png') no-repeat center; /* Your Spark Icon */
-            background-size: contain; animation: breathe 3s infinite ease-in-out;
+        .spark {
+            color: var(--wmt-yellow);
+            margin-left: 5px;
+            font-size: 55px;
         }
 
-        @keyframes breathe {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+        /* Action Buttons Row */
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .chat-container {
-            background: white; border: 2px solid var(--wmt-blue);
-            width: 400px; padding: 30px; border-radius: 15px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .action-btn {
+            width: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            font-weight: bold;
+            color: var(--wmt-blue);
+            text-align: center;
+            cursor: pointer;
         }
 
-        .btn { background: var(--wmt-blue); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        /* Central Voice Circle Section */
+        #voice-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #voice-circle {
+            width: 150px;
+            height: 150px;
+            background-color: var(--wmt-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 0 rgba(0, 113, 206, 0.4);
+            animation: pulsate 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes pulsate {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 113, 206, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(0, 113, 206, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 113, 206, 0); }
+        }
+
+        #pause-btn {
+            margin-top: 15px;
+            font-size: 24px;
+            color: var(--wmt-blue);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* Text Input Area (Privacy) */
+        #text-input-section {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            align-items: center;
+        }
+
+        .input-box {
+            flex-grow: 1;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .mic-icon { font-size: 20px; cursor: pointer; }
+
+        /* Footer Section */
+        #footer {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+
+        #transcript {
+            margin-top: 10px;
+            font-style: italic;
+            color: #777;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
 
-<div id="site-background"></div>
-
-<div id="ai-trigger" onclick="toggleAI()">
-    ✨ "I can shop for you! Click to try our new AI assistant."
-</div>
-
-<div id="ai-assistant">
-    <div id="spark"></div>
-    <div class="chat-container">
-        <h2 style="color: var(--wmt-blue);">How can I help you today?</h2>
-        <p>Upload a grocery list or tell me what you need for your '75 Corvette.</p>
-        <button class="btn" onclick="startVoice()">Speak to AI</button>
-        <button class="btn" style="background:#666; margin-left:10px;" onclick="toggleAI()">Close</button>
+    <div id="header">
+        <div class="wmt-logo">Walmart <span class="spark">✱</span></div>
+        
+        <div class="button-row">
+            <div class="action-btn">CHECK OUT</div>
+            <div class="action-btn">INFO</div>
+            <div class="action-btn">CART</div>
+        </div>
     </div>
-</div>
 
-<script>
-    function toggleAI() {
-        const ui = document.getElementById('ai-assistant');
-        ui.style.display = ui.style.display === 'flex' ? 'none' : 'flex';
-    }
+    <div id="voice-container">
+        <div id="voice-circle">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="white">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+        </div>
+        <button id="pause-btn">⏸</button>
+        <div id="transcript">Listening for your grocery list...</div>
+    </div>
 
-    async function startVoice() {
-        // This is where the communication happens!
-        console.log("Connecting to Box Talk Brain...");
-        // Add your fetch call here to talk to server.js
-    }
-</script>
+    <div id="text-input-section">
+        <span class="mic-icon">🎤</span>
+        <input type="text" class="input-box" placeholder="Type your grocery list here...">
+        <button style="background:none; border:none; color:var(--wmt-blue); font-weight:bold; cursor:pointer;">SEND</button>
+    </div>
 
+    <div id="footer">
+        <div>powered by <strong>Vox Talk</strong></div>
+        <div style="cursor:pointer;">Contact one of our human team members</div>
+    </div>
+
+    <script>
+        // Simple logic to pause animation
+        const circle = document.getElementById('voice-circle');
+        const pauseBtn = document.getElementById('pause-btn');
+        let isPaused = false;
+
+        pauseBtn.onclick = () => {
+            isPaused = !isPaused;
+            circle.style.animation = isPaused ? 'none' : 'pulsate 2s infinite';
+            pauseBtn.innerText = isPaused ? '▶' : '⏸';
+        };
+    </script>
 </body>
 </html>
