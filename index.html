@@ -2,110 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vox Talk AI - The Brain</title>
+    <title>Walmart AI Assistant</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #111; color: white; overflow: hidden; }
-        
-        /* The Background Store Image */
-        #bg-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://i.imgur.com/uR1xIEx.png') no-repeat center center;
-            background-size: cover; filter: blur(8px) brightness(0.4); z-index: 1;
+        :root {
+            --wmt-blue: #0071ce;
+            --wmt-yellow: #ffc220;
         }
 
-        /* The Vox Brain (Pulsating Orb) */
-        .container { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        
-        #vox-brain {
-            width: 180px; height: 180px;
-            background: radial-gradient(circle, #0071dc 0%, #ffc220 100%);
-            border-radius: 50%;
-            box-shadow: 0 0 60px rgba(0, 113, 220, 0.8);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; animation: pulse 2.5s infinite; transition: all 0.3s;
+        body, html { margin: 0; padding: 0; font-family: "Bogle", sans-serif; overflow: hidden; }
+
+        /* Use your Walmart Static Screen as the background */
+        #site-background {
+            position: fixed; width: 100%; height: 100%;
+            background: url('https://i.imgur.com/vH9v5Zt.jpg') no-repeat top center; /* Replace with your file link */
+            background-size: cover; z-index: 1;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 30px #0071dc; }
-            50% { transform: scale(1.1); box-shadow: 0 0 70px #ffc220; }
-            100% { transform: scale(1); box-shadow: 0 0 30px #0071dc; }
+        /* The AI Trigger Bar - Matches the Blue Header */
+        #ai-trigger {
+            position: fixed; top: 120px; width: 100%; background: var(--wmt-yellow);
+            color: #333; text-align: center; padding: 12px; font-weight: bold;
+            z-index: 10; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* Upload Zone */
-        #upload-zone {
-            margin-top: 30px; padding: 20px;
-            border: 2px dashed rgba(255,255,255,0.3);
-            border-radius: 15px; text-align: center; background: rgba(0,0,0,0.5);
-            transition: 0.3s; width: 300px;
+        /* The Friendly Assistant Overlay */
+        #ai-assistant {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); z-index: 100;
+            flex-direction: column; align-items: center; justify-content: center;
         }
-        #upload-zone:hover { border-color: #ffc220; background: rgba(0,0,0,0.7); }
 
-        /* The Result Card */
-        #result-card {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, 200%);
-            background: white; color: #333; padding: 25px; border-radius: 20px;
-            width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* The Friendly Pulsating Spark */
+        #spark {
+            width: 120px; height: 120px;
+            background: url('https://i.imgur.com/2i6oUfQ.png') no-repeat center; /* Your Spark Icon */
+            background-size: contain; animation: breathe 3s infinite ease-in-out;
         }
-        #result-card.active { transform: translate(-50%, -50%); }
-        
-        .btn { background: #0071dc; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; }
+
+        @keyframes breathe {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .chat-container {
+            background: white; border: 2px solid var(--wmt-blue);
+            width: 400px; padding: 30px; border-radius: 15px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .btn { background: var(--wmt-blue); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="bg-overlay"></div>
+<div id="site-background"></div>
 
-<div class="container">
-    <div id="vox-brain" onclick="simulateTalk()">
-        <strong style="text-shadow: 1px 1px 5px black;">VOX TALK</strong>
-    </div>
-
-    <div id="upload-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-        <p>Drop Grocery PDF/List Here</p>
-        <input type="file" id="fileInput" style="display:none" onchange="handleFile()">
-        <small style="color: #ccc;">or click to upload</small>
-    </div>
+<div id="ai-trigger" onclick="toggleAI()">
+    ✨ "I can shop for you! Click to try our new AI assistant."
 </div>
 
-<div id="result-card">
-    <h2 id="status-title">AI Processing...</h2>
-    <div id="item-details">
-        <p><strong>Item:</strong> <span id="item-name">Searching...</span></p>
-        <p><strong>SKU:</strong> <span id="sku">---</span></p>
+<div id="ai-assistant">
+    <div id="spark"></div>
+    <div class="chat-container">
+        <h2 style="color: var(--wmt-blue);">How can I help you today?</h2>
+        <p>Upload a grocery list or tell me what you need for your '75 Corvette.</p>
+        <button class="btn" onclick="startVoice()">Speak to AI</button>
+        <button class="btn" style="background:#666; margin-left:10px;" onclick="toggleAI()">Close</button>
     </div>
-    <button class="btn" onclick="closeCard()">Add to Cart & Continue</button>
 </div>
 
 <script>
-    function simulateTalk() {
-        const brain = document.getElementById('vox-brain');
-        brain.style.animation = "pulse 0.4s infinite"; // Talk speed
-        
-        setTimeout(() => {
-            showResult("Ribeye Steak", "WM-109283");
-            brain.style.animation = "pulse 2.5s infinite";
-        }, 2000);
+    function toggleAI() {
+        const ui = document.getElementById('ai-assistant');
+        ui.style.display = ui.style.display === 'flex' ? 'none' : 'flex';
     }
 
-    function dragOverHandler(ev) { ev.preventDefault(); }
-
-    function dropHandler(ev) {
-        ev.preventDefault();
-        showResult("Processing List...", "Reading PDF...");
-        setTimeout(() => showResult("Peanuts (Unsalted)", "SKU-44552"), 2000);
-    }
-
-    function showResult(name, sku) {
-        document.getElementById('item-name').innerText = name;
-        document.getElementById('sku').innerText = sku;
-        document.getElementById('status-title').innerText = "Found Match!";
-        document.getElementById('result-card').classList.add('active');
-    }
-
-    function closeCard() {
-        document.getElementById('result-card').classList.remove('active');
+    async function startVoice() {
+        // This is where the communication happens!
+        console.log("Connecting to Box Talk Brain...");
+        // Add your fetch call here to talk to server.js
     }
 </script>
 
