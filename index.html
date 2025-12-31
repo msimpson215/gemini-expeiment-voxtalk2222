@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vox Talk AI Prototype</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* The "Store" Background */
+        #store-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/uR1xIEx.png') no-repeat center center; /* Placeholder Walmart-ish bg */
+            background-size: cover;
+            filter: blur(5px) brightness(0.7);
+            z-index: 1;
+        }
+
+        /* The AI Brain (The Ball) */
+        #vox-brain {
+            position: relative;
+            z-index: 10;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #0071dc 0%, #ffc220 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(0, 113, 220, 0.6);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 113, 220, 0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 0 60px rgba(255, 194, 32, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 113, 220, 0.4); }
+        }
+
+        /* Result Card */
+        #result-card {
+            position: absolute;
+            bottom: -200px;
+            z-index: 20;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 300px;
+            text-align: center;
+            transition: bottom 0.5s ease-out;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #result-card.show { bottom: 50px; }
+
+        .btn-cart {
+            background: #ffc220;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="store-bg"></div>
+
+    <div id="vox-brain" onclick="startTalking()">
+        <span style="color: white; font-weight: bold; text-align: center;">VOX TALK<br>Click Me</span>
+    </div>
+
+    <div id="result-card" id="card">
+        <h3 id="item-name">Found: HEI Distributor</h3>
+        <p id="item-desc">Fits: 1975 Corvette 350 V8</p>
+        <button class="btn-cart" onclick="addToCart()">Add Straight to Cart</button>
+    </div>
+
+    <script>
+        function startTalking() {
+            const brain = document.getElementById('vox-brain');
+            brain.style.animation = "pulse 0.5s infinite"; // Speed up animation
+            
+            // Simulating the "Thinking" process
+            setTimeout(() => {
+                document.getElementById('result-card').classList.add('show');
+                brain.style.animation = "pulse 2s infinite";
+            }, 1500);
+        }
+
+        function addToCart() {
+            alert("Added to Cart! Connecting to Store API...");
+            document.getElementById('result-card').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
